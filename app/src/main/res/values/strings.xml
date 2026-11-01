@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">PolarMobile</string>
+    <string name="subtitle">Polar H10 → Lab Streaming Layer</string>
+    <string name="device">Device</string>
+    <string name="scan">Scan</string>
+    <string name="stop_scan">Stop</string>
+    <string name="no_devices">Tap Scan and wear the H10 (wet the electrodes) so it starts advertising.</string>
+    <string name="streams">LSL streams</string>
+    <string name="stream_ecg">ECG · 130 Hz · µV</string>
+    <string name="stream_acc">Accelerometer · 3 axes · mG</string>
+    <string name="stream_hr">Heart rate &amp; RR intervals</string>
+    <string name="acc_rate">ACC rate (Hz)</string>
+    <string name="acc_range">ACC range (g)</string>
+    <string name="start_streaming">Start streaming</string>
+    <string name="stop_streaming">Stop streaming</string>
+    <string name="select_device">Select a device first</string>
+    <string name="status">Status</string>
+    <string name="preview">Signal</string>
+    <string name="stop">Stop</string>
+    <string name="notification_channel">Streaming</string>
+    <string name="permissions_needed">Bluetooth permissions are required to find and connect to the H10.</string>
+    <string name="bluetooth_off">Bluetooth is turned off</string>
+    <string name="enable_bluetooth">Turn on</string>
+    <string name="no_network">No Wi-Fi / network: LSL consumers on other machines cannot see the streams.</string>
+</resources>

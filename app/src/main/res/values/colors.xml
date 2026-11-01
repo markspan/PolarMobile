@@ -1,0 +1,8 @@
+<resources>
+    <color name="polar_red">#D0182F</color>
+    <color name="polar_red_dark">#410008</color>
+    <color name="polar_red_container">#FFDAD9</color>
+    <color name="acc_blue">#1E6FD9</color>
+    <color name="acc_green">#2E8B57</color>
+    <color name="ic_launcher_background">#D0182F</color>
+</resources>

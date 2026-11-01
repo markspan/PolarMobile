@@ -1,0 +1,19 @@
+<resources>
+    <style name="Theme.PolarMobile" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/polar_red</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/polar_red_container</item>
+        <item name="colorOnPrimaryContainer">@color/polar_red_dark</item>
+        <item name="colorTertiary">@color/acc_blue</item>
+        <item name="colorSecondary">@color/acc_green</item>
+    </style>
+
+    <style name="Card" parent="Widget.Material3.CardView.Filled">
+        <item name="android:layout_marginBottom">12dp</item>
+    </style>
+
+    <style name="CardTitle">
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+</resources>
