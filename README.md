@@ -59,6 +59,15 @@ key). Uninstall it once and install again; later releases update in place.
   status card) on the consumer side.
 - Exclude the app from battery optimisation on aggressive OEM ROMs for long recordings.
 
+## Analysing the recordings
+
+Record the streams with LabRecorder (or RECORDA on the phone) to an `.xdf` file and analyse it
+with **[spectHR](https://github.com/markspan/spectHR)**, a free, open-source desktop application
+for heart rate variability analysis. Its XDF loader was written for the Polar H10 streams of
+PolarBLE, and PolarMobile publishes the same stream names and types. spectHR takes the ECG
+through R-peak detection, IBI cleaning, epochs, Poincaré and spectral (LF/HF) HRV analysis, and
+can use the accelerometer stream as a respiration surrogate for RSA analysis.
+
 ## Why there is no iPhone version
 
 liblsl builds for iOS and the BLE code would port easily, but Apple's platform restrictions make
@@ -149,6 +158,7 @@ Sciences and lecturer in Experimental Psychology, University of Groningen, the N
 - [liblsl](https://github.com/sccn/liblsl) and
   [liblsl-android-builder](https://github.com/mvidaldp/liblsl-android-builder)
 - [SENDA, RECORDA and VIEWA](https://github.com/NeuropsyOL) by NeuropsyOL, for LSL on Android
+- [spectHR](https://github.com/markspan/spectHR), for analysing the recorded ECG and ACC data
 
 ## License
 
