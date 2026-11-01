@@ -27,12 +27,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -109,6 +112,13 @@ class MainActivity : AppCompatActivity() {
             "PolarMobile ${BuildConfig.VERSION_NAME} · liblsl ${LslNative.libraryVersion() / 100}." +
                 "${LslNative.libraryVersion() % 100}"
         }.getOrElse { "liblsl failed to load: ${it.message}" }
+        findViewById<MaterialToolbar>(R.id.toolbar).apply {
+            inflateMenu(R.menu.main)
+            setOnMenuItemClickListener { item ->
+                if (item.itemId == R.id.action_about) showAbout()
+                item.itemId == R.id.action_about
+            }
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -258,6 +268,23 @@ class MainActivity : AppCompatActivity() {
         scanButton.setText(if (scanning) R.string.stop_scan else R.string.scan)
         scanProgress.visibility = if (scanning) View.VISIBLE else View.GONE
         noDevices.visibility = if (devices.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    // --- about --------------------------------------------------------------------------------
+
+    private fun showAbout() {
+        val view = layoutInflater.inflate(R.layout.dialog_about, null)
+        view.findViewById<TextView>(R.id.aboutVersion).text = "PolarMobile ${BuildConfig.VERSION_NAME}"
+        view.findViewById<TextView>(R.id.aboutLibraries).text = runCatching {
+            "liblsl ${LslNative.libraryVersion() / 100}.${LslNative.libraryVersion() % 100} · LGPL-2.1"
+        }.getOrDefault("LGPL-2.1")
+        MaterialAlertDialogBuilder(this)
+            .setView(view)
+            .setPositiveButton(R.string.about_open_github) { _, _ ->
+                runCatching { startActivity(Intent(Intent.ACTION_VIEW, getString(R.string.project_url).toUri())) }
+            }
+            .setNegativeButton(R.string.about_close, null)
+            .show()
     }
 
     // --- streaming ------------------------------------------------------------------------------

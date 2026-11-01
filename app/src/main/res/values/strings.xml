@@ -21,5 +21,13 @@
     <string name="permissions_needed">Bluetooth permissions are required to find and connect to the H10.</string>
     <string name="bluetooth_off">Bluetooth is turned off</string>
     <string name="enable_bluetooth">Turn on</string>
+    <string name="about">About</string>
+    <string name="about_description">Relays ECG, accelerometer, heart rate and RR intervals from a Polar H10 to Lab Streaming Layer. Android counterpart of PolarBLE.</string>
+    <string name="about_author_name">Mark M. Span</string>
+    <string name="about_author_roles">Scientific Advisor, Research Support, Faculty of Behavioural and Social Sciences\nLecturer, Experimental Psychology\nUniversity of Groningen, the Netherlands</string>
+    <string name="about_links">Project: https://github.com/markspan/PolarMobile\nGitHub: https://github.com/markspan\nStaff page: https://www.rug.nl/staff/m.m.span/</string>
+    <string name="about_open_github">GitHub page</string>
+    <string name="about_close">Close</string>
+    <string name="project_url" translatable="false">https://github.com/markspan/PolarMobile</string>
     <string name="no_network">No Wi-Fi / network: LSL consumers on other machines cannot see the streams.</string>
 </resources>

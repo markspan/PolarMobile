@@ -20,6 +20,7 @@ any machine on the same network with LabRecorder.
   after a BLE drop-out while the LSL outlets stay up
 - Live ECG/ACC preview, battery level, and a per-outlet "consumer connected" indicator
 - Time stamping is left to liblsl (see below)
+- About screen (ⓘ in the toolbar) with version, author and a link to this GitHub page
 
 `<name>` is the advertised device name, e.g. `Polar H10 A1B2C3D4`, exactly as in PolarBLE.
 
@@ -31,9 +32,14 @@ Download the APK from the GitHub Actions artifacts / Releases, or build it yours
 adb install -r PolarMobile-1.0.0-release.apk
 ```
 
-or copy the APK to the phone and open it (allow "install unknown apps").
+or copy the APK to the phone and open it (allow "install unknown apps"). The GitHub Actions
+artifact is a zip; unzip it first.
 
 Requires Android 8.0 (API 26) or newer with Bluetooth LE.
+
+If Android reports "App not installed", an older PolarMobile signed with a different key is
+already on the phone (builds before the project key was introduced used a per-machine debug
+key). Uninstall it once and install again; later releases update in place.
 
 ## Use
 
@@ -109,6 +115,25 @@ The PMD start commands are the same bytes PolarBLE writes:
 
 Data frames: byte 0 measurement type, bytes 1–8 timestamp (ns, little endian), byte 9 frame type,
 then samples (ECG: signed 24-bit µV; ACC frame type 1: 3 × signed 16-bit mG).
+
+## Author
+
+**Mark M. Span**, Scientific Advisor at Research Support of the Faculty of Behavioural and Social
+Sciences and lecturer in Experimental Psychology, University of Groningen, the Netherlands.
+
+- GitHub: [markspan](https://github.com/markspan)
+- Staff page: [rug.nl/staff/m.m.span](https://www.rug.nl/staff/m.m.span/?lang=en)
+
+## Acknowledgements
+
+- [PolarBLE](https://github.com/markspan/PolarBLE) and
+  [PolarBand2lsl](https://github.com/markspan/PolarBand2lsl), the Windows and Python
+  predecessors of this app
+- [Dont-hold-your-breath](https://github.com/kieranabrennan/dont-hold-your-breath) by Kieran
+  Brennan, for the Polar PMD protocol details
+- [liblsl](https://github.com/sccn/liblsl) and
+  [liblsl-android-builder](https://github.com/mvidaldp/liblsl-android-builder)
+- [SENDA, RECORDA and VIEWA](https://github.com/NeuropsyOL) by NeuropsyOL, for LSL on Android
 
 ## License
 
