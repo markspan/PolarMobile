@@ -6,6 +6,9 @@ on:
     tags: ["v*"]
   pull_request:
 
+permissions:
+  contents: write # attach the APK to releases on v* tags
+
 jobs:
   build:
     runs-on: ubuntu-latest
