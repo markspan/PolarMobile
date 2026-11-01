@@ -59,6 +59,21 @@ key). Uninstall it once and install again; later releases update in place.
   status card) on the consumer side.
 - Exclude the app from battery optimisation on aggressive OEM ROMs for long recordings.
 
+## Why there is no iPhone version
+
+liblsl builds for iOS and the BLE code would port easily, but Apple's platform restrictions make
+an iPhone relay impractical:
+
+- **Multicast is blocked.** Since iOS 14, apps need the `com.apple.developer.networking.multicast`
+  entitlement, which must be requested from and approved by Apple, to send or receive multicast.
+  Without it LSL stream discovery does not work; every consumer would need the phone's IP in
+  `KnownPeers`.
+- **No background streaming.** iOS may suspend an app's network activity once it leaves the
+  foreground, so the app would have to stay open on screen for the whole recording.
+- **No sideloading.** Apps can only be built with Xcode on a Mac. Without a paid Apple Developer
+  account ($99/year) an installed build expires after 7 days; distributing to colleagues or
+  participants requires TestFlight or the App Store.
+
 ## Timing
 
 PolarMobile does not compute timestamps. Each PMD packet is pushed to its outlet as one chunk,
