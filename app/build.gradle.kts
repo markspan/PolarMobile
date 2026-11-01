@@ -14,6 +14,10 @@ val localProps = Properties().apply {
 val liblslDir: String = (findProperty("liblsl.dir") as String?)
     ?: localProps.getProperty("liblsl.dir")
     ?: ""
+// Release signing key: environment variable, else local.properties key; empty counts as unset.
+fun signingValue(env: String, prop: String): String? =
+    System.getenv(env)?.takeIf { it.isNotEmpty() } ?: localProps.getProperty(prop)?.takeIf { it.isNotEmpty() }
+val releaseKeystore: String? = signingValue("POLARMOBILE_KEYSTORE", "polarmobile.keystore")
 // Comma separated ABI list, e.g. -Pabis=arm64-v8a for a faster single-ABI build.
 val abiList: List<String> = ((findProperty("abis") as String?) ?: "arm64-v8a,armeabi-v7a,x86_64")
     .split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -47,15 +51,14 @@ android {
     }
 
     signingConfigs {
-        // Release signing from environment variables (e.g. in CI); falls back to the debug key so
-        // that `assembleRelease` always yields an installable APK.
+        // Release signing from environment variables (CI) or local.properties (local builds);
+        // falls back to the debug key so that `assembleRelease` always yields an installable APK.
         create("release") {
-            val ks = System.getenv("POLARMOBILE_KEYSTORE")
-            if (ks != null) {
-                storeFile = file(ks)
-                storePassword = System.getenv("POLARMOBILE_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("POLARMOBILE_KEY_ALIAS")
-                keyPassword = System.getenv("POLARMOBILE_KEY_PASSWORD")
+            if (releaseKeystore != null) {
+                storeFile = file(releaseKeystore)
+                storePassword = signingValue("POLARMOBILE_KEYSTORE_PASSWORD", "polarmobile.keystore.password")
+                keyAlias = signingValue("POLARMOBILE_KEY_ALIAS", "polarmobile.key.alias")
+                keyPassword = signingValue("POLARMOBILE_KEY_PASSWORD", "polarmobile.key.password")
             }
         }
     }
@@ -64,7 +67,7 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = if (System.getenv("POLARMOBILE_KEYSTORE") != null)
+            signingConfig = if (releaseKeystore != null)
                 signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }

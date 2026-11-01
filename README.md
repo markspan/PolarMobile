@@ -81,8 +81,13 @@ APKs land in `app/build/outputs/apk/<variant>/`. Useful options:
 - `-Pabis=arm64-v8a` builds a single ABI (much faster; default is arm64-v8a, armeabi-v7a, x86_64)
 - `-Pliblsl.dir=/path/to/liblsl` (or `liblsl.dir=` in `local.properties`) builds against a local
   liblsl checkout instead of the downloaded release
-- Release builds are signed with the debug key unless `POLARMOBILE_KEYSTORE`,
-  `POLARMOBILE_KEYSTORE_PASSWORD`, `POLARMOBILE_KEY_ALIAS` and `POLARMOBILE_KEY_PASSWORD` are set.
+- Release builds are signed with the project key when it is configured, otherwise with the debug
+  key. Locally, set `polarmobile.keystore`, `polarmobile.keystore.password`,
+  `polarmobile.key.alias` and `polarmobile.key.password` in `local.properties` (or the
+  `POLARMOBILE_KEYSTORE`, `POLARMOBILE_KEYSTORE_PASSWORD`, `POLARMOBILE_KEY_ALIAS`,
+  `POLARMOBILE_KEY_PASSWORD` environment variables). CI uses the repository secrets
+  `POLARMOBILE_KEYSTORE_BASE64` (the base64-encoded keystore) and the three password/alias
+  secrets. APKs signed with different keys cannot be installed over each other.
 
 ## Project layout
 
