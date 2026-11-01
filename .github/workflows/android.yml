@@ -17,10 +17,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
-
+      # The ubuntu runner image ships the Android SDK (ANDROID_HOME); add NDK and CMake.
       - name: Install NDK and CMake
-        run: sdkmanager "ndk;28.2.13676358" "cmake;3.31.6"
+        run: |
+          SDKMANAGER=$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          yes | "$SDKMANAGER" --install "ndk;28.2.13676358" "cmake;3.31.6" > /dev/null
 
       - uses: gradle/actions/setup-gradle@v4
 
