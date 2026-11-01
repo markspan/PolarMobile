@@ -4,12 +4,9 @@ import io.github.markspan.polarmobile.ble.HeartRateMeasurement
 import io.github.markspan.polarmobile.ble.PmdCommand
 import io.github.markspan.polarmobile.ble.PmdControlResponse
 import io.github.markspan.polarmobile.ble.PmdParser
-import io.github.markspan.polarmobile.stream.FrameTimestamper
-import io.github.markspan.polarmobile.stream.SensorClock
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PmdParserTest {
@@ -78,23 +75,4 @@ class PmdParserTest {
         assertEquals(listOf(1000f, 500f), hr.rrMs)
     }
 
-    @Test
-    fun timestampsAreEvenlySpacedAndNeverInTheFuture() {
-        val clock = SensorClock()
-        val stamper = FrameTimestamper(130.0, clock)
-        val dt = 1.0 / 130
-        var sensorT = 10.0
-        var lastTs = Double.NEGATIVE_INFINITY
-        for (frame in 0 until 50) {
-            sensorT += 73 * dt
-            val arrival = sensorT + 1000.0 + 0.02 + (frame % 5) * 0.015 // BLE jitter
-            val ts = stamper.timestamps((sensorT * 1e9).toLong(), 73, arrival)
-            assertTrue(ts.last() <= arrival + 1e-9)
-            for (i in 1 until ts.size) assertEquals(dt, ts[i] - ts[i - 1], 1e-6)
-            assertTrue(ts.first() > lastTs)
-            lastTs = ts.last()
-        }
-        // offset converges to the minimum latency (0.02 s)
-        assertEquals(sensorT + 1000.02, lastTs, 1e-3)
-    }
 }

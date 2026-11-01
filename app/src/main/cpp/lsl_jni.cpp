@@ -79,19 +79,18 @@ JNIEXPORT jlong JNICALL JNI_FN(createOutlet)(JNIEnv *env, jobject, jstring name,
 	return reinterpret_cast<jlong>(outlet);
 }
 
-/** Pushes `sampleCount` multiplexed samples with one LSL timestamp per sample. */
-JNIEXPORT jint JNICALL JNI_FN(pushChunk)(
-	JNIEnv *env, jobject, jlong handle, jfloatArray data, jdoubleArray timestamps, jint sampleCount) {
+/**
+ * Pushes a chunk of multiplexed samples and leaves time stamping to liblsl: the last sample gets
+ * lsl_local_clock() at push time, earlier ones are spaced back by the nominal rate.
+ */
+JNIEXPORT jint JNICALL JNI_FN(pushChunk)(JNIEnv *env, jobject, jlong handle, jfloatArray data) {
 	auto outlet = reinterpret_cast<lsl_outlet>(handle);
-	if (!outlet || sampleCount <= 0) return 0;
 	const jsize nData = env->GetArrayLength(data);
-	if (env->GetArrayLength(timestamps) < sampleCount || nData % sampleCount != 0) return -1;
+	if (!outlet || nData == 0) return 0;
 
 	std::vector<float> buf(static_cast<size_t>(nData));
-	std::vector<double> ts(static_cast<size_t>(sampleCount));
 	env->GetFloatArrayRegion(data, 0, nData, buf.data());
-	env->GetDoubleArrayRegion(timestamps, 0, sampleCount, ts.data());
-	return lsl_push_chunk_ftnp(outlet, buf.data(), static_cast<unsigned long>(nData), ts.data(), 1);
+	return lsl_push_chunk_ftp(outlet, buf.data(), static_cast<unsigned long>(nData), 0.0, 1);
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(haveConsumers)(JNIEnv *, jobject, jlong handle) {

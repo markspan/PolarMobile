@@ -26,7 +26,7 @@ object LslNative {
         maxBuffered: Int,
     ): Long
 
-    external fun pushChunk(handle: Long, data: FloatArray, timestamps: DoubleArray, sampleCount: Int): Int
+    external fun pushChunk(handle: Long, data: FloatArray): Int
     external fun haveConsumers(handle: Long): Boolean
     external fun destroyOutlet(handle: Long)
 }
@@ -58,11 +58,14 @@ class LslOutlet(
         check(handle != 0L) { "Could not create LSL outlet '$name'" }
     }
 
-    /** [data] holds `timestamps.size` samples of [channelCount] values each, multiplexed. */
+    /**
+     * Pushes one or more samples of [channelCount] values each, multiplexed. liblsl assigns the
+     * time stamps (see `pushChunk` in lsl_jni.cpp).
+     */
     @Synchronized
-    fun push(data: FloatArray, timestamps: DoubleArray) {
+    fun push(data: FloatArray) {
         val h = handle
-        if (h != 0L && timestamps.isNotEmpty()) LslNative.pushChunk(h, data, timestamps, timestamps.size)
+        if (h != 0L && data.isNotEmpty()) LslNative.pushChunk(h, data)
     }
 
     val hasConsumers: Boolean

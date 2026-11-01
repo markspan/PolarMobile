@@ -25,7 +25,6 @@ import io.github.markspan.polarmobile.ble.PmdCommand
 import io.github.markspan.polarmobile.ble.PmdFrame
 import io.github.markspan.polarmobile.ble.PolarH10Client
 import io.github.markspan.polarmobile.lsl.IRREGULAR_RATE
-import io.github.markspan.polarmobile.lsl.LslNative
 import io.github.markspan.polarmobile.lsl.LslOutlet
 
 /**
@@ -45,10 +44,6 @@ class PolarStreamService : Service() {
     private var accOutlet: LslOutlet? = null
     private var hrOutlet: LslOutlet? = null
     private var rrOutlet: LslOutlet? = null
-
-    private var sensorClock = SensorClock()
-    private var ecgTimes = FrameTimestamper(PmdCommand.ECG_SAMPLE_RATE.toDouble(), sensorClock)
-    private var accTimes = FrameTimestamper(200.0, sensorClock)
 
     private var wakeLock: PowerManager.WakeLock? = null
     private var wifiLock: WifiManager.WifiLock? = null
@@ -144,10 +139,6 @@ class PolarStreamService : Service() {
             stop()
             return
         }
-        // A fresh sensor clock per connection: the H10's clock may restart while disconnected.
-        sensorClock = SensorClock()
-        ecgTimes = FrameTimestamper(PmdCommand.ECG_SAMPLE_RATE.toDouble(), sensorClock)
-        accTimes = FrameTimestamper(config.accRate.toDouble(), sensorClock)
         client = PolarH10Client(this, adapter.getRemoteDevice(address), config, listener).also { it.connect() }
     }
 
@@ -160,17 +151,14 @@ class PolarStreamService : Service() {
         override fun onStreaming() = StreamState.update { it.copy(streaming = true) }
 
         override fun onPmdFrame(frame: PmdFrame) {
-            val now = LslNative.localClock()
             when (frame.measurementType) {
                 PmdCommand.MEASUREMENT_ECG -> {
-                    val ts = ecgTimes.timestamps(frame.sensorTimeNs, frame.sampleCount, now)
-                    ecgOutlet?.push(frame.samples, ts)
+                    ecgOutlet?.push(frame.samples)
                     StreamState.ecgPreview.add(frame.samples)
                     StreamState.update { it.copy(ecgSamples = it.ecgSamples + frame.sampleCount) }
                 }
                 PmdCommand.MEASUREMENT_ACC -> {
-                    val ts = accTimes.timestamps(frame.sensorTimeNs, frame.sampleCount, now)
-                    accOutlet?.push(frame.samples, ts)
+                    accOutlet?.push(frame.samples)
                     StreamState.accPreview.add(frame.samples)
                     StreamState.update { it.copy(accSamples = it.accSamples + frame.sampleCount) }
                 }
@@ -178,19 +166,8 @@ class PolarStreamService : Service() {
         }
 
         override fun onHeartRate(measurement: HeartRateMeasurement) {
-            val now = LslNative.localClock()
-            hrOutlet?.push(floatArrayOf(measurement.bpm.toFloat()), doubleArrayOf(now))
-            if (measurement.rrMs.isNotEmpty()) {
-                // The last interval ended at (about) the arrival time; earlier beats precede it.
-                val rr = measurement.rrMs
-                val ts = DoubleArray(rr.size)
-                var t = now
-                for (i in rr.indices.reversed()) {
-                    ts[i] = t
-                    t -= rr[i] / 1000.0
-                }
-                rrOutlet?.push(rr.toFloatArray(), ts)
-            }
+            hrOutlet?.push(floatArrayOf(measurement.bpm.toFloat()))
+            if (measurement.rrMs.isNotEmpty()) rrOutlet?.push(measurement.rrMs.toFloatArray())
             StreamState.update { it.copy(heartRate = measurement.bpm) }
         }
 

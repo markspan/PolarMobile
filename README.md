@@ -19,7 +19,7 @@ any machine on the same network with LabRecorder.
 - Runs as a foreground service: keeps streaming with the screen off, reconnects automatically
   after a BLE drop-out while the LSL outlets stay up
 - Live ECG/ACC preview, battery level, and a per-outlet "consumer connected" indicator
-- Sample timestamps are derived from the H10's own clock, mapped onto the LSL clock (see below)
+- Time stamping is left to liblsl (see below)
 
 `<name>` is the advertised device name, e.g. `Polar H10 A1B2C3D4`, exactly as in PolarBLE.
 
@@ -55,12 +55,11 @@ Requires Android 8.0 (API 26) or newer with Bluetooth LE.
 
 ## Timing
 
-Every PMD data packet carries the sensor timestamp of its last sample. PolarMobile maps the
-sensor clock onto `lsl_local_clock()` using the minimum observed transmission delay (a lower
-envelope that is allowed to drift ±200 ppm), and spaces the samples within a packet by the
-interval measured between consecutive packets. ECG and ACC share one mapping, so they stay
-aligned with each other, and timestamps do not inherit BLE delivery jitter. Absolute latency
-relative to other LSL streams is the BLE link's minimum delay (typically a few tens of ms).
+PolarMobile does not compute timestamps. Each PMD packet is pushed to its outlet as one chunk,
+and liblsl assigns the times: the last sample gets `lsl_local_clock()` at push time and earlier
+samples are spaced back by the nominal rate. Heart-rate and RR values (irregular rate) are
+stamped at arrival. Correct for BLE delivery jitter and clock drift on the consumer side, as with
+any LSL stream, e.g. with the dejittering in pyxdf / `load_xdf`.
 
 ## Build
 
@@ -94,7 +93,6 @@ APKs land in `app/build/outputs/apk/<variant>/`. Useful options:
 | `.../ble/Pmd.kt` | Polar PMD protocol: UUIDs, start commands, frame and heart-rate parsers |
 | `.../ble/PolarH10Client.kt` | GATT client with a serialized operation queue |
 | `.../stream/PolarStreamService.kt` | Foreground service: BLE ↔ LSL, locks, reconnects |
-| `.../stream/SensorClock.kt` | Sensor-clock → LSL-clock mapping and per-sample timestamps |
 | `.../MainActivity.kt`, `.../ui/SignalView.kt` | UI and live preview |
 
 ## Protocol reference
